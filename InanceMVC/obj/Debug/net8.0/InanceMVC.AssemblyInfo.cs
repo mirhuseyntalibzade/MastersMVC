@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InanceMVC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ffd03d685d712412b8add23b5b3c9d6c0593557d")]
 [assembly: System.Reflection.AssemblyProductAttribute("InanceMVC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InanceMVC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

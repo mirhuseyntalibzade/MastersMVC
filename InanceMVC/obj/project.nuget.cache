@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "qek7ONn1x8I=",
+  "dgSpecHash": "uywMCYLKAiQ=",
   "success": true,
-  "projectFilePath": "C:\\Users\\My Computer\\source\\repos\\InanceMVC\\InanceMVC\\InanceMVC.csproj",
+  "projectFilePath": "C:\\Users\\My Computer\\Desktop\\CodeAcademy\\MastersMVC\\InanceMVC\\InanceMVC.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\My Computer\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\My Computer\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

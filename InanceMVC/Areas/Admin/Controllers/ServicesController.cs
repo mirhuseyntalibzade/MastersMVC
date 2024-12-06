@@ -1,6 +1,10 @@
-﻿using InanceMVC.DAL.Contexts;
+﻿using Humanizer;
+using InanceMVC.DAL.Contexts;
+using InanceMVC.DTO.ServiceDTO;
 using InanceMVC.Models;
+using InanceMVC.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,9 +15,11 @@ namespace InanceMVC.Areas.Admin.Controllers
 	public class ServicesController : Controller
     {
         readonly AppDbContext _context;
-        public ServicesController(AppDbContext context)
+        readonly IWebHostEnvironment _webHostEnvironment;
+        public ServicesController(AppDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
         public async Task<IActionResult> Index()
         {
@@ -35,13 +41,35 @@ namespace InanceMVC.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Service service)
+        public async Task<IActionResult> Create(CreateServiceDTO dto)
         {
             if (!ModelState.IsValid)
             {
-                return View(service);
+                return View(dto);
             }
-            service.CreatedAt = DateTime.Now;
+            string? imagePath = null;
+
+            if (dto.ImageFile != null)
+            {
+                try
+                {
+                    imagePath = await dto.ImageFile.SaveFileAsync(_webHostEnvironment, "uploads/services", 5 * 1024 * 1024);
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("ImageFile", ex.Message);
+                    return View(dto);
+                }
+            }
+
+            var service = new Service
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                ImagePath = imagePath,
+                CreatedAt = DateTime.Now
+            };
+
             await _context.Services.AddAsync(service);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", "Services");
@@ -89,6 +117,32 @@ namespace InanceMVC.Areas.Admin.Controllers
             return RedirectToAction("Index", "Services");
         }
 
+        public async Task<IActionResult> DeleteImage(int id)
+        {
+            Service? service = await _context.Services.FirstOrDefaultAsync(m => m.Id == id);
+            if (service == null)
+            {
+                return NotFound("Service not found.");
+            }
+            if (!string.IsNullOrEmpty(service.ImagePath))
+            {
+                string fullPath = Path.Combine(_webHostEnvironment.WebRootPath, service.ImagePath);
+
+                if (System.IO.File.Exists(fullPath))
+                {
+                    System.IO.File.Delete(fullPath);
+                }
+
+                service.ImagePath = null;
+                service.UpdatedAt = DateTime.Now;
+
+                _context.Services.Update(service);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Index", "Services");
+        }
+
         public async Task<IActionResult> Edit(int Id)
         {
             Service? updatedService = await _context.Services.FirstOrDefaultAsync(m => m.Id == Id);
@@ -97,7 +151,14 @@ namespace InanceMVC.Areas.Admin.Controllers
                 return NotFound("Something went wrong!");
             }
             ViewBag.Services = _context.Services;
-            return View(updatedService);
+            UpdateServiceDTO dto = new()
+            {
+                Id = updatedService.Id,
+                Title = updatedService.Title,
+                Description = updatedService.Description,
+                ImagePath = updatedService.ImagePath
+            };
+            return View(dto);
         }
 
         [HttpPost]
